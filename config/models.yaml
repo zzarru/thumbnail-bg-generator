@@ -17,3 +17,13 @@ imagen:
   name: "Imagen 4.0"
   model_id: "imagen-4.0-generate-001"
   provider: "imagen"
+
+gpt_image:
+  name: "GPT Image (gpt-image-1)"
+  model_id: "gpt-image-1"
+  provider: "openai"
+
+dall_e_3:
+  name: "DALL-E 3"
+  model_id: "dall-e-3"
+  provider: "openai"

@@ -1,9 +1,12 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+import base64
+
 import yaml
 from google import genai
 from google.genai import types
+from openai import OpenAI
 
 
 @dataclass
@@ -22,12 +25,15 @@ class ImageGenerator:
         models_config_path: Path | str = "config/models.yaml",
         max_per_model: int = 5,
         max_total: int = 20,
+        openai_api_key: str = "",
     ):
         self.api_key = api_key
+        self.openai_api_key = openai_api_key
         self.max_per_model = max_per_model
         self.max_total = max_total
         self._models = self._load_models(Path(models_config_path))
-        self._client = genai.Client(api_key=api_key)
+        self._client = genai.Client(api_key=api_key) if api_key else None
+        self._openai_client = OpenAI(api_key=openai_api_key) if openai_api_key else None
 
     def _load_models(self, path: Path) -> dict:
         with open(path, "r", encoding="utf-8") as f:
@@ -68,6 +74,8 @@ class ImageGenerator:
                         self._generate_gemini(prompt, model_config["model_id"], filepath)
                     elif provider == "imagen":
                         self._generate_imagen(prompt, model_config["model_id"], filepath)
+                    elif provider == "openai":
+                        self._generate_openai(prompt, model_config["model_id"], filepath)
 
                     results.append(GenerationResult(
                         model_key=model_key,
@@ -92,7 +100,7 @@ class ImageGenerator:
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_modalities=["IMAGE"],
-                image_config=types.ImageConfig(aspect_ratio="3:2"),
+                image_config=types.ImageConfig(aspect_ratio="16:9"),
             ),
         )
         for part in response.parts:
@@ -107,7 +115,7 @@ class ImageGenerator:
             model=model_id,
             prompt=prompt,
             config=types.GenerateImagesConfig(
-                aspect_ratio="3:2",
+                aspect_ratio="16:9",
                 number_of_images=1,
             ),
         )
@@ -116,3 +124,15 @@ class ImageGenerator:
             image.save(str(output_path))
             return
         raise RuntimeError("No image in Imagen response")
+
+    def _generate_openai(self, prompt: str, model_id: str, output_path: Path):
+        response = self._openai_client.images.generate(
+            model=model_id,
+            prompt=prompt,
+            n=1,
+            size="1536x1024",
+            response_format="b64_json",
+        )
+        image_data = base64.b64decode(response.data[0].b64_json)
+        with open(output_path, "wb") as f:
+            f.write(image_data)

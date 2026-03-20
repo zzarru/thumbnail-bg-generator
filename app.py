@@ -4,6 +4,7 @@ from pathlib import Path
 
 from config.settings import (
     GOOGLE_API_KEY,
+    OPENAI_API_KEY,
     SUPABASE_URL,
     SUPABASE_ANON_KEY,
     TEMP_DIR,
@@ -38,6 +39,7 @@ def get_image_generator():
     return ImageGenerator(
         api_key=GOOGLE_API_KEY,
         models_config_path=CONFIG_DIR / "models.yaml",
+        openai_api_key=OPENAI_API_KEY,
     )
 
 
@@ -62,7 +64,7 @@ with st.sidebar:
         st.warning("강의를 찾을 수 없습니다.")
         st.stop()
 
-    lecture_options = {f"{lec['id']} - {lec['title']}": lec for lec in lectures}
+    lecture_options = {f"{lec['product_id']} - {lec['title']}": lec for lec in lectures}
     selected_label = st.selectbox("강의 선택", options=list(lecture_options.keys()))
     selected_lecture = lecture_options[selected_label]
 
@@ -119,7 +121,7 @@ if generate_btn:
             model_keys=selected_models,
             count_per_model=count_per_model,
             output_dir=TEMP_DIR,
-            lecture_id=str(selected_lecture["id"]),
+            lecture_id=str(selected_lecture["product_id"]),
         )
 
     st.session_state["results"] = results
@@ -147,7 +149,7 @@ if "results" in st.session_state:
                     logger = get_logger()
                     for r in results:
                         logger.log(
-                            lecture_id=str(selected_lecture["id"]),
+                            lecture_id=str(selected_lecture["product_id"]),
                             model_key=r.model_key,
                             prompt=edited_prompt,
                             image_path=str(r.image_path) if r.image_path else "",

@@ -1,10 +1,10 @@
 from supabase import create_client, Client
 
-LECTURE_FIELDS = "id, title, category, level, keywords, concept, tools"
+LECTURE_FIELDS = "product_id, title, category, level, keywords, concept, tools"
 
 
 class DBReader:
-    def __init__(self, url: str, key: str, table_name: str = "lectures"):
+    def __init__(self, url: str, key: str, table_name: str = "packt_products"):
         self.client: Client = create_client(url, key)
         self.table_name = table_name
 
@@ -20,7 +20,7 @@ class DBReader:
         response = (
             self.client.table(self.table_name)
             .select(LECTURE_FIELDS)
-            .eq("id", lecture_id)
+            .eq("product_id", lecture_id)
             .single()
             .execute()
         )

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>썸네일 배경 생성기 - Mockup</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; background: #0e1117; color: #fafafa; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 300px;
+      background: #262730;
+      padding: 24px 16px;
+      border-right: 1px solid #3a3a4a;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    .sidebar h2 { font-size: 14px; color: #a0a0b0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+    .sidebar label { display: block; font-size: 13px; color: #c0c0d0; margin-bottom: 6px; font-weight: 600; }
+    .sidebar input, .sidebar select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #3a3a4a;
+      border-radius: 6px;
+      background: #0e1117;
+      color: #fafafa;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    .sidebar input:focus, .sidebar select:focus { outline: none; border-color: #ff4b4b; }
+    .sidebar .divider { height: 1px; background: #3a3a4a; margin: 16px 0; }
+
+    /* Multiselect */
+    .model-checkboxes { margin-bottom: 16px; }
+    .model-checkboxes label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #e0e0e0;
+      font-weight: 400;
+      padding: 4px 0;
+      cursor: pointer;
+    }
+    .model-checkboxes input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: #ff4b4b;
+      margin: 0;
+    }
+
+    /* Number input */
+    .count-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .count-input input {
+      width: 60px;
+      text-align: center;
+      margin-bottom: 0;
+    }
+    .count-input span { font-size: 12px; color: #808090; }
+
+    /* Generate button */
+    .btn-generate {
+      width: 100%;
+      padding: 12px;
+      background: #ff4b4b;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-generate:hover { background: #e03e3e; }
+
+    /* Main content */
+    .main {
+      flex: 1;
+      padding: 24px 32px;
+      overflow-y: auto;
+    }
+    .main h1 { font-size: 24px; margin-bottom: 24px; font-weight: 700; }
+
+    /* Lecture info */
+    .lecture-info {
+      background: #1a1a2e;
+      border: 1px solid #2a2a3e;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .lecture-info h3 { font-size: 16px; color: #ff4b4b; margin-bottom: 8px; }
+    .lecture-info .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .lecture-info .tag {
+      background: #2a2a4e;
+      color: #a0b0ff;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+    /* Prompt area */
+    .prompt-section { margin-bottom: 24px; }
+    .prompt-section label { display: block; font-size: 14px; color: #c0c0d0; margin-bottom: 8px; font-weight: 600; }
+    .prompt-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 12px;
+      border: 1px solid #3a3a4a;
+      border-radius: 8px;
+      background: #1a1a2e;
+      color: #e0e0f0;
+      font-size: 13px;
+      line-height: 1.6;
+      resize: vertical;
+      font-family: 'Consolas', monospace;
+    }
+    .prompt-textarea:focus { outline: none; border-color: #ff4b4b; }
+
+    /* Image grid */
+    .results-section h2 { font-size: 18px; margin-bottom: 16px; }
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .image-card {
+      background: #1a1a2e;
+      border: 1px solid #2a2a3e;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .image-card:hover { border-color: #ff4b4b; }
+    .image-placeholder {
+      width: 100%;
+      aspect-ratio: 3/2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: #606080;
+    }
+    /* Placeholder gradients for different models */
+    .placeholder-nb2 { background: linear-gradient(135deg, #1a1a4e, #2a3a6e, #1a2a5e); }
+    .placeholder-nbpro { background: linear-gradient(135deg, #2e1a4e, #4a2a6e, #3a1a5e); }
+    .placeholder-nb { background: linear-gradient(135deg, #1a3a3e, #2a4a5e, #1a4a4e); }
+    .placeholder-imagen { background: linear-gradient(135deg, #3a2a1a, #5a3a2a, #4a2a1a); }
+
+    .image-card-footer {
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .model-label { font-size: 12px; color: #a0a0b0; }
+    .btn-select {
+      padding: 6px 16px;
+      background: transparent;
+      border: 1px solid #ff4b4b;
+      color: #ff4b4b;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-select:hover { background: #ff4b4b; color: white; }
+
+    /* Status bar */
+    .status-bar {
+      margin-top: 20px;
+      padding: 12px 16px;
+      background: #1a3a2a;
+      border: 1px solid #2a5a3a;
+      border-radius: 8px;
+      color: #4ade80;
+      font-size: 13px;
+      display: none;
+    }
+    .status-bar.visible { display: block; }
+
+    /* Loading spinner */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px;
+      color: #a0a0b0;
+    }
+    .loading.visible { display: block; }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #3a3a4a;
+      border-top-color: #ff4b4b;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Settings</h2>
+
+    <label>강의 검색</label>
+    <input type="text" placeholder="강의 제목 입력..." id="search-input">
+
+    <label>강의 선택</label>
+    <select id="lecture-select">
+      <option>12 - Python 딥러닝 기초</option>
+      <option>45 - React 웹 개발 마스터</option>
+      <option>78 - 자연어처리 NLP 실전</option>
+      <option>103 - JavaScript 풀스택</option>
+      <option>156 - 컴퓨터 비전 입문</option>
+    </select>
+
+    <div class="divider"></div>
+
+    <label>스타일 선택</label>
+    <select id="style-select">
+      <option value="minimalist">미니멀리스트</option>
+      <option value="cyberpunk">사이버펑크</option>
+      <option value="watercolor">수채화</option>
+      <option value="modern_tech">모던 테크</option>
+      <option value="abstract">추상</option>
+    </select>
+
+    <div class="divider"></div>
+
+    <label>모델 선택 (복수 가능)</label>
+    <div class="model-checkboxes">
+      <label><input type="checkbox" checked> Nano Banana 2 (Fast)</label>
+      <label><input type="checkbox" checked> Nano Banana Pro (Quality)</label>
+      <label><input type="checkbox"> Nano Banana (Efficient)</label>
+      <label><input type="checkbox"> Imagen 4.0</label>
+    </div>
+
+    <div class="divider"></div>
+
+    <label>모델당 생성 장수</label>
+    <div class="count-input">
+      <input type="number" value="2" min="1" max="5" id="count-input">
+      <span>총 4장 생성 예정</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="btn-generate" onclick="handleGenerate()">이미지 생성</button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <h1>강의 썸네일 배경 이미지 생성기</h1>
+
+    <!-- Lecture Info -->
+    <div class="lecture-info">
+      <h3>Python 딥러닝 기초</h3>
+      <div style="font-size: 13px; color: #a0a0b0;">카테고리: 인공지능 | 레벨: 입문</div>
+      <div class="tags">
+        <span class="tag">딥러닝</span>
+        <span class="tag">신경망</span>
+        <span class="tag">Python</span>
+        <span class="tag">TensorFlow</span>
+      </div>
+    </div>
+
+    <!-- Prompt Preview -->
+    <div class="prompt-section">
+      <label>프롬프트 미리보기 (수정 가능)</label>
+      <textarea class="prompt-textarea">minimalist flat design, clean composition, soft gradient background, AI, neural network, data visualization, algorithm, deep learning, blue-purple gradient color scheme, 딥러닝, 신경망, theme: AI 기초 학습, related to: pytorch, tensorflow, 입문 level complexity, no text or letters anywhere in the image, no human faces or people, background image only, suitable for thumbnail overlay, high quality, visually appealing, 3:2 aspect ratio composition</textarea>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <div>4장 이미지 생성 중...</div>
+    </div>
+
+    <!-- Results -->
+    <div class="results-section" id="results">
+      <h2>생성 결과</h2>
+      <div class="image-grid">
+        <!-- NB2 #1 -->
+        <div class="image-card">
+          <div class="image-placeholder placeholder-nb2">
+            <span>Nano Banana 2 #1<br>생성된 이미지</span>
+          </div>
+          <div class="image-card-footer">
+            <span class="model-label">Nano Banana 2 (Fast) #1</span>
+            <button class="btn-select" onclick="handleSelect(this)">선택</button>
+          </div>
+        </div>
+        <!-- NB2 #2 -->
+        <div class="image-card">
+          <div class="image-placeholder placeholder-nb2">
+            <span>Nano Banana 2 #2<br>생성된 이미지</span>
+          </div>
+          <div class="image-card-footer">
+            <span class="model-label">Nano Banana 2 (Fast) #2</span>
+            <button class="btn-select" onclick="handleSelect(this)">선택</button>
+          </div>
+        </div>
+        <!-- NB Pro #1 -->
+        <div class="image-card">
+          <div class="image-placeholder placeholder-nbpro">
+            <span>Nano Banana Pro #1<br>생성된 이미지</span>
+          </div>
+          <div class="image-card-footer">
+            <span class="model-label">Nano Banana Pro (Quality) #1</span>
+            <button class="btn-select" onclick="handleSelect(this)">선택</button>
+          </div>
+        </div>
+        <!-- NB Pro #2 -->
+        <div class="image-card">
+          <div class="image-placeholder placeholder-nbpro">
+            <span>Nano Banana Pro #2<br>생성된 이미지</span>
+          </div>
+          <div class="image-card-footer">
+            <span class="model-label">Nano Banana Pro (Quality) #2</span>
+            <button class="btn-select" onclick="handleSelect(this)">선택</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="status-bar visible" id="status">
+      저장 완료: output/12_thumbnail.png
+    </div>
+  </div>
+
+  <script>
+    function handleGenerate() {
+      document.getElementById('loading').classList.add('visible');
+      document.getElementById('results').style.display = 'none';
+      document.getElementById('status').classList.remove('visible');
+
+      setTimeout(() => {
+        document.getElementById('loading').classList.remove('visible');
+        document.getElementById('results').style.display = 'block';
+      }, 1500);
+    }
+
+    function handleSelect(btn) {
+      document.querySelectorAll('.btn-select').forEach(b => {
+        b.textContent = '선택';
+        b.style.background = 'transparent';
+        b.style.color = '#ff4b4b';
+      });
+      btn.textContent = '선택됨';
+      btn.style.background = '#ff4b4b';
+      btn.style.color = 'white';
+      document.getElementById('status').classList.add('visible');
+    }
+
+    // Update total count
+    document.getElementById('count-input').addEventListener('input', function() {
+      const count = parseInt(this.value) || 0;
+      const checked = document.querySelectorAll('.model-checkboxes input:checked').length;
+      this.parentElement.querySelector('span').textContent = `총 ${count * checked}장 생성 예정`;
+    });
+
+    document.querySelectorAll('.model-checkboxes input').forEach(cb => {
+      cb.addEventListener('change', function() {
+        const count = parseInt(document.getElementById('count-input').value) || 0;
+        const checked = document.querySelectorAll('.model-checkboxes input:checked').length;
+        document.querySelector('.count-input span').textContent = `총 ${count * checked}장 생성 예정`;
+      });
+    });
+  </script>
+</body>
+</html>
