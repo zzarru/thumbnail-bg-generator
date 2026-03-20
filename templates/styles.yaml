@@ -1,0 +1,19 @@
+minimalist:
+  name: "미니멀리스트"
+  prompt: "minimalist flat design, clean composition, soft gradient background"
+
+cyberpunk:
+  name: "사이버펑크"
+  prompt: "cyberpunk style, neon lights, dark background, futuristic elements"
+
+watercolor:
+  name: "수채화"
+  prompt: "watercolor painting style, soft edges, artistic brush strokes"
+
+modern_tech:
+  name: "모던 테크"
+  prompt: "modern technology aesthetic, sleek surfaces, geometric shapes, digital atmosphere"
+
+abstract:
+  name: "추상"
+  prompt: "abstract art style, bold colors, flowing shapes, artistic composition"

@@ -1,0 +1,6 @@
+rules:
+  - "no text or letters anywhere in the image"
+  - "no human faces or people"
+  - "background image only, suitable for thumbnail overlay"
+  - "high quality, visually appealing"
+  - "3:2 aspect ratio composition"
