@@ -142,7 +142,7 @@ if "results" in st.session_state:
                 if st.button(f"선택", key=f"select_{idx}"):
                     # Save as final
                     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-                    final_path = OUTPUT_DIR / f"{selected_lecture['id']}_thumbnail.png"
+                    final_path = OUTPUT_DIR / f"{selected_lecture['product_id']}_thumbnail.png"
                     shutil.copy2(result.image_path, final_path)
 
                     # Log all results

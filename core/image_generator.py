@@ -126,13 +126,28 @@ class ImageGenerator:
         raise RuntimeError("No image in Imagen response")
 
     def _generate_openai(self, prompt: str, model_id: str, output_path: Path):
-        response = self._openai_client.images.generate(
-            model=model_id,
-            prompt=prompt,
-            n=1,
-            size="1536x1024",
-            response_format="b64_json",
-        )
-        image_data = base64.b64decode(response.data[0].b64_json)
-        with open(output_path, "wb") as f:
-            f.write(image_data)
+        if model_id == "gpt-image-1":
+            response = self._openai_client.images.generate(
+                model=model_id,
+                prompt=prompt,
+                n=1,
+                size="1536x1024",
+            )
+        else:
+            # DALL-E 3: 지원 크기 1024x1024, 1024x1792, 1792x1024
+            response = self._openai_client.images.generate(
+                model=model_id,
+                prompt=prompt,
+                n=1,
+                size="1792x1024",
+                response_format="b64_json",
+            )
+
+        image_data_item = response.data[0]
+        if image_data_item.b64_json:
+            image_bytes = base64.b64decode(image_data_item.b64_json)
+            with open(output_path, "wb") as f:
+                f.write(image_bytes)
+        elif image_data_item.url:
+            import urllib.request
+            urllib.request.urlretrieve(image_data_item.url, str(output_path))
