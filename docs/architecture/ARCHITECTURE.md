@@ -78,7 +78,38 @@
 - **category_context.yaml**: 카테고리별 시각 요소 + 색상 톤
 - **base_prompt.yaml**: 공통 규칙 (no text, no faces, background only 등)
 
-## 6. 파일 저장 구조
+## 6. 프로젝트 디렉토리 구조
+
+```
+thumbnail-bg-generator/
+├── app.py                      # Streamlit 메인 애플리케이션
+├── requirements.txt            # 의존성 패키지 목록
+├── .env.example                # 환경 변수 예시 파일
+├── CLAUDE.md                   # Gitmoji 커밋 컨벤션 (Claude Code 자동 참조)
+├── config/
+│   ├── settings.py             # 환경 변수 및 경로 설정
+│   └── models.yaml             # AI 모델 목록 및 설정
+├── core/
+│   ├── db_reader.py            # Supabase 강의 데이터 조회
+│   ├── prompt_builder.py       # YAML 템플릿 기반 프롬프트 생성
+│   ├── image_generator.py      # Gemini / Imagen / OpenAI 이미지 생성
+│   └── logger.py               # 생성 이력 JSONL 로깅
+├── templates/
+│   ├── styles.yaml             # 이미지 스타일 템플릿
+│   ├── category_context.yaml   # 강의 카테고리별 시각 컨텍스트
+│   └── base_prompt.yaml        # 공통 기본 프롬프트 규칙
+├── tests/                      # 단위 테스트
+├── docs/
+│   ├── architecture/           # 아키텍처 문서 + SVG 다이어그램
+│   ├── mockup/                 # UI 목업
+│   ├── superpowers/            # PRD 및 구현 계획
+│   └── tutorial.md             # 비개발자를 위한 바이브 코딩 튜토리얼
+└── output/                     # 생성된 이미지 저장 폴더 (자동 생성)
+    ├── temp/                   # 후보 이미지 임시 저장
+    └── logs/                   # 생성 로그
+```
+
+## 7. 파일 저장 구조
 
 ```
 output/
@@ -102,7 +133,7 @@ output/
 }
 ```
 
-## 7. 환경변수
+## 8. 환경변수
 
 | 변수 | 용도 | 필수 |
 |------|------|------|
@@ -111,7 +142,7 @@ output/
 | `SUPABASE_URL` | Supabase 프로젝트 URL | 필수 |
 | `SUPABASE_ANON_KEY` | Supabase 익명 키 (읽기 전용) | 필수 |
 
-## 8. 개발 로드맵
+## 9. 개발 로드맵
 
 ### Phase 1: 단일 생성 MVP ✅
 - 단일 강의 선택 → 이미지 생성 → 비교 → 선택 저장

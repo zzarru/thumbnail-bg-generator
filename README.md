@@ -101,8 +101,10 @@ thumbnail-bg-generator/
 │   └── logs/                   # 생성 로그 (generation_log.jsonl)
 ├── docs/
 │   ├── architecture/           # 아키텍처 문서 + SVG 다이어그램
-│   └── superpowers/            # PRD 및 구현 계획
-└── mockup/                     # UI 목업
+│   ├── mockup/                 # UI 목업
+│   ├── superpowers/            # PRD 및 구현 계획
+│   └── tutorial.md             # 비개발자를 위한 바이브 코딩 튜토리얼
+└── CLAUDE.md                   # Gitmoji 커밋 컨벤션 (Claude Code 자동 참조)
 ```
 
 ## AI 모델 목록
@@ -119,6 +121,7 @@ thumbnail-bg-generator/
 ## 문서
 
 - [아키텍처 문서](docs/architecture/ARCHITECTURE.md) — 시스템 구조, 데이터 플로우, 모듈 의존성 (SVG 다이어그램 포함)
+- [바이브 코딩 튜토리얼](docs/tutorial.md) — 비개발자를 위한 AI 기반 개발 가이드
 - [PRD](docs/superpowers/specs/2026-03-20-thumbnail-bg-generator-design.md) — 제품 요구사항 정의서
 - [구현 계획](docs/superpowers/plans/2026-03-20-thumbnail-bg-generator-phase1.md) — Phase 1 구현 계획
 
